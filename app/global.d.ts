@@ -19,7 +19,6 @@ declare interface Window {
     };
     fs: {
       writeBinaryFile(path: string, data: Uint8Array): Promise<void>;
-      writeTextFile(path: string, data: string): Promise<void>;
     };
     notification:{
       requestPermission(): Promise<Permission>;
