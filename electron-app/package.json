@@ -1,7 +1,7 @@
 {
   "name": "BRClient",
   "version": "1.11.2",
-  "description": "BRClient is a cross-platform Bedrock client, including Web/Win/Linux/OSX/PWA.",
+  "description": "BRClient is a cross-platform Yi's Assistant, including Web/Win/Linux/OSX/PWA.",
   "main": "main.js",
   "scripts": {
     "start": "npm run copy && electron .",
