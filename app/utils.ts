@@ -3,15 +3,24 @@ import { showToast } from "./components/ui-lib";
 import Locale from "./locales";
 import { RequestMessage } from "./client/api";
 import { DEFAULT_MODELS } from "./constant";
+import { pdfjs } from "react-pdf";
+import * as mammoth from "mammoth";
+import readXlsxFile from "read-excel-file";
+
+// Path to the pdf.worker.js file
+// pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
+pdfjs.GlobalWorkerOptions.workerSrc = `pdf.worker.js`;
 
 export function trimTopic(topic: string) {
   // Fix an issue where double quotes still show in the Indonesian language
   // This will remove the specified punctuation from the end of the string
   // and also trim quotes from both the start and end if they exist.
-  return topic
-    // fix for gemini
-    .replace(/^["“”*]+|["“”*]+$/g, "")
-    .replace(/[，。！？”“"、,.!?*]*$/, "");
+  return (
+    topic
+      // fix for gemini
+      .replace(/^["“”*]+|["“”*]+$/g, "")
+      .replace(/[，。！？”“"、,.!?*]*$/, "")
+  );
 }
 
 export async function copyToClipboard(text: string) {
@@ -57,9 +66,9 @@ export async function downloadAs(text: string, filename: string) {
 
     if (result !== null) {
       try {
-        await window.__TAURI__.fs.writeTextFile(
+        await window.__TAURI__.fs.writeBinaryFile(
           result,
-          text
+          new Uint8Array([...text].map((c) => c.charCodeAt(0))),
         );
         showToast(Locale.Download.Success);
       } catch (error) {
@@ -292,11 +301,159 @@ export function getMessageImages(message: RequestMessage): string[] {
 }
 
 export function isVisionModel(model: string) {
-  // Note: This is a better way using the TypeScript feature instead of `&&` or `||` (ts v5.5.0-dev.20240314 I've been using)
-  const visionKeywords = [
-    "vision",
-    "claude-3",
-  ];
-
-  return visionKeywords.some(keyword => model.includes(keyword));
+  return (
+    // model.startsWith("gpt-4-vision") ||
+    // model.startsWith("gemini-pro-vision") ||
+    model.includes("vision") ||
+    model.includes("claude3") ||
+    (model.includes("claude") && model.includes("3")) ||
+    model.includes("Claude3") ||
+    (model.includes("Claude") && model.includes("3")) ||
+    model.includes("claude-3")
+  );
 }
+
+/**
+ * Extracts text content from a PDF file.
+ * @param {File} file - The PDF file to extract text from.
+ * @returns {Promise<string>} A promise that resolves with the extracted text content.
+ */
+const pdfToText = async (file: File): Promise<string | undefined> => {
+  try {
+    // Create a blob URL for the PDF file
+    const blobUrl = URL.createObjectURL(file);
+
+    // Load the PDF file
+    const loadingTask = pdfjs.getDocument(blobUrl);
+
+    const pdf = await loadingTask.promise;
+    const numPages = pdf.numPages;
+    let extractedText = "";
+
+    // Iterate through each page and extract text
+    for (let pageNumber = 1; pageNumber <= numPages; pageNumber++) {
+      const page = await pdf.getPage(pageNumber);
+      const textContent = await page.getTextContent();
+      const pageText = textContent.items.map((item: any) => item.str).join(" ");
+      extractedText += pageText;
+    }
+
+    if (extractedText.length > 0) {
+      return extractedText;
+    }
+
+    console.error("Error extracting text from PDF:");
+
+    // Clean up the blob URL
+    URL.revokeObjectURL(blobUrl);
+  } catch (error) {
+    console.error("Error extracting text from PDF:", error);
+  }
+};
+
+/**
+ * Reads the contents of a file (CSV, TXT, or Markdown).
+ * @param {File} file - The file to read.
+ * @returns {Promise<string>} A promise that resolves with the file contents.
+ */
+const readTXTFile = async (file: File): Promise<string | undefined> => {
+  try {
+    const fileExtension = file.name.split(".").pop()?.toLowerCase();
+
+    if (!fileExtension || !["csv", "txt", "md"].includes(fileExtension)) {
+      console.error("Unsupported file type:", fileExtension);
+      return;
+    }
+
+    const fileReader = new FileReader();
+
+    return new Promise<string>((resolve, reject) => {
+      fileReader.onload = () => {
+        if (fileReader.result && typeof fileReader.result === "string") {
+          resolve(fileReader.result);
+        } else {
+          reject(new Error("Failed to read file contents"));
+        }
+      };
+
+      fileReader.onerror = () => {
+        reject(new Error("Error reading file"));
+      };
+
+      fileReader.readAsText(file);
+    });
+  } catch (error) {
+    console.error("Error reading file:", error);
+  }
+};
+
+/**
+ * Extracts the text content from a .docx file.
+ *
+ * @param {File} file - The .docx file to extract text from.
+ * @returns {Promise<string | undefined>} A promise that resolves with the extracted text content, or undefined if an error occurs.
+ */
+const extractTextFromDocx = async (file: File): Promise<string | undefined> => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+
+    reader.onload = () => {
+      if (reader.result) {
+        const buffer = reader.result as ArrayBuffer;
+        mammoth
+          .extractRawText({ arrayBuffer: buffer })
+          .then((result) => {
+            const text = result.value;
+            resolve(text);
+          })
+          .catch((error) => {
+            reject(error);
+          });
+      } else {
+        reject(new Error("Failed to read file"));
+      }
+    };
+
+    reader.onerror = () => {
+      reject(reader.error);
+    };
+
+    reader.readAsArrayBuffer(file);
+  });
+};
+
+/**
+ * Extracts text content from an .xlsx file.
+ *
+ * @param {File} file - The .xlsx file to extract text from.
+ * @returns {Promise<string | undefined>} A promise that resolves with the extracted text content, or undefined if an error occurs.
+ */
+const extractTextFromXlsx = async (file: File): Promise<string | undefined> => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+
+    reader.onload = () => {
+      if (reader.result) {
+        const buffer = reader.result as ArrayBuffer;
+        readXlsxFile(buffer)
+          .then((rows) => {
+            const textContent = rows.map((row) => row.join("\t")).join("\n");
+            resolve(textContent);
+          })
+          .catch((error) => {
+            reject(error);
+          });
+      } else {
+        reject(new Error("Failed to read file"));
+      }
+    };
+
+    reader.onerror = () => {
+      reject(reader.error);
+    };
+
+    reader.readAsArrayBuffer(file);
+  });
+};
+
+export { pdfToText, readTXTFile, extractTextFromDocx, extractTextFromXlsx };

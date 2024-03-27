@@ -7,6 +7,8 @@ import { useState, useEffect } from "react";
 import styles from "./home.module.scss";
 
 import BotIcon from "../icons/bot.svg";
+import BedrockBotIcon from "../icons/bedrock_16.svg";
+
 import LoadingIcon from "../icons/three-dots.svg";
 
 import { getCSSVar, useMobileScreen } from "../utils";
@@ -33,7 +35,7 @@ import { useAccessStore } from "../store";
 export function Loading(props: { noLogo?: boolean }) {
   return (
     <div className={styles["loading-content"] + " no-dark"}>
-      {!props.noLogo && <BotIcon />}
+      {!props.noLogo && <BedrockBotIcon />}
       <LoadingIcon />
     </div>
   );
@@ -169,13 +171,12 @@ function Screen() {
 
 export function useLoadData() {
   const config = useAppConfig();
-
-  var api: ClientApi;
-  if (config.modelConfig.model.startsWith("gemini")) {
-    api = new ClientApi(ModelProvider.GeminiPro);
-  } else {
-    api = new ClientApi(ModelProvider.GPT);
-  }
+  var api: ClientApi = new ClientApi(ModelProvider.Claude);
+  // if (config.modelConfig.model.startsWith("gemini")) {
+  //   api = new ClientApi(ModelProvider.GeminiPro);
+  // } else {
+  //   api = new ClientApi(ModelProvider.GPT);
+  // }
   useEffect(() => {
     (async () => {
       const models = await api.llm.models();

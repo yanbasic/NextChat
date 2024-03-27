@@ -1,5 +1,5 @@
-export const OWNER = "Yidadaa";
-export const REPO = "ChatGPT-Next-Web";
+export const OWNER = "DamonDeng";
+export const REPO = "BRClient";
 export const REPO_URL = `https://github.com/${OWNER}/${REPO}`;
 export const ISSUE_URL = `https://github.com/${OWNER}/${REPO}/issues`;
 export const UPDATE_URL = `${REPO_URL}#keep-updated`;
@@ -23,7 +23,7 @@ export enum Path {
 }
 
 export enum ApiPath {
-  Cors = "",
+  Cors = "/api/cors",
   OpenAI = "/api/openai",
 }
 
@@ -67,11 +67,15 @@ export enum ServiceProvider {
   OpenAI = "OpenAI",
   Azure = "Azure",
   Google = "Google",
+  AWS = "AWS",
 }
 
 export enum ModelProvider {
   GPT = "GPT",
   GeminiPro = "GeminiPro",
+  // Anthropic = "Anthropic",
+  Claude = "Claude",
+  AWS = "AWS",
 }
 
 export const OpenaiPath = {
@@ -119,174 +123,27 @@ export const KnowledgeCutOffDate: Record<string, string> = {
 
 export const DEFAULT_MODELS = [
   {
-    name: "gpt-4",
+    name: "claude-3-sonnet",
     available: true,
+    modelId: "anthropic.claude-3-sonnet-20240229-v1:0",
+    anthropic_version: "bedrock-2023-05-31",
+    displayName: "Claude3 sonnet",
     provider: {
-      id: "openai",
-      providerName: "OpenAI",
-      providerType: "openai",
+      id: "aws",
+      providerName: "AWS",
+      providerType: "aws",
     },
   },
   {
-    name: "gpt-4-0314",
+    name: "claude-3-haiku",
     available: true,
+    modelId: "anthropic.claude-3-haiku-20240307-v1:0",
+    anthropic_version: "bedrock-2023-05-31",
+    displayName: "Claude3 haiku",
     provider: {
-      id: "openai",
-      providerName: "OpenAI",
-      providerType: "openai",
-    },
-  },
-  {
-    name: "gpt-4-0613",
-    available: true,
-    provider: {
-      id: "openai",
-      providerName: "OpenAI",
-      providerType: "openai",
-    },
-  },
-  {
-    name: "gpt-4-32k",
-    available: true,
-    provider: {
-      id: "openai",
-      providerName: "OpenAI",
-      providerType: "openai",
-    },
-  },
-  {
-    name: "gpt-4-32k-0314",
-    available: true,
-    provider: {
-      id: "openai",
-      providerName: "OpenAI",
-      providerType: "openai",
-    },
-  },
-  {
-    name: "gpt-4-32k-0613",
-    available: true,
-    provider: {
-      id: "openai",
-      providerName: "OpenAI",
-      providerType: "openai",
-    },
-  },
-  {
-    name: "gpt-4-turbo-preview",
-    available: true,
-    provider: {
-      id: "openai",
-      providerName: "OpenAI",
-      providerType: "openai",
-    },
-  },
-  {
-    name: "gpt-4-1106-preview",
-    available: true,
-    provider: {
-      id: "openai",
-      providerName: "OpenAI",
-      providerType: "openai",
-    },
-  },
-  {
-    name: "gpt-4-0125-preview",
-    available: true,
-    provider: {
-      id: "openai",
-      providerName: "OpenAI",
-      providerType: "openai",
-    },
-  },
-  {
-    name: "gpt-4-vision-preview",
-    available: true,
-    provider: {
-      id: "openai",
-      providerName: "OpenAI",
-      providerType: "openai",
-    },
-  },
-  {
-    name: "gpt-3.5-turbo",
-    available: true,
-    provider: {
-      id: "openai",
-      providerName: "OpenAI",
-      providerType: "openai",
-    },
-  },
-  {
-    name: "gpt-3.5-turbo-0125",
-    available: true,
-    provider: {
-      id: "openai",
-      providerName: "OpenAI",
-      providerType: "openai",
-    },
-  },
-  {
-    name: "gpt-3.5-turbo-0301",
-    available: true,
-    provider: {
-      id: "openai",
-      providerName: "OpenAI",
-      providerType: "openai",
-    },
-  },
-  {
-    name: "gpt-3.5-turbo-0613",
-    available: true,
-    provider: {
-      id: "openai",
-      providerName: "OpenAI",
-      providerType: "openai",
-    },
-  },
-  {
-    name: "gpt-3.5-turbo-1106",
-    available: true,
-    provider: {
-      id: "openai",
-      providerName: "OpenAI",
-      providerType: "openai",
-    },
-  },
-  {
-    name: "gpt-3.5-turbo-16k",
-    available: true,
-    provider: {
-      id: "openai",
-      providerName: "OpenAI",
-      providerType: "openai",
-    },
-  },
-  {
-    name: "gpt-3.5-turbo-16k-0613",
-    available: true,
-    provider: {
-      id: "openai",
-      providerName: "OpenAI",
-      providerType: "openai",
-    },
-  },
-  {
-    name: "gemini-pro",
-    available: true,
-    provider: {
-      id: "google",
-      providerName: "Google",
-      providerType: "google",
-    },
-  },
-  {
-    name: "gemini-pro-vision",
-    available: true,
-    provider: {
-      id: "google",
-      providerName: "Google",
-      providerType: "google",
+      id: "aws",
+      providerName: "AWS",
+      providerType: "aws",
     },
   },
 ] as const;
