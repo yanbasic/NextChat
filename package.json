@@ -30,7 +30,7 @@
     "@hello-pangea/dnd": "^16.5.0",
     "@next/third-parties": "^14.1.0",
     "@svgr/webpack": "^6.5.1",
-    "@vercel/analytics": "^0.1.11",
+    "@vercel/analytics": "^1.2.2",
     "@vercel/speed-insights": "^1.0.2",
     "aws-crt": "^1.18.0",
     "aws-sdk": "^2.1472.0",
