@@ -102,7 +102,7 @@ import { getClientConfig } from "../config/client";
 import { useAllModels } from "../utils/hooks";
 import { MultimodalContent } from "../client/api";
 
-import { pdfToText, readTXTFile } from "../utils";
+import { readTXTFile } from "../utils";
 
 const Markdown = dynamic(async () => (await import("./markdown")).Markdown, {
   loading: () => <LoadingIcon />,
@@ -351,16 +351,7 @@ export function DocumentsList(props: {
         fileInput.onchange = (event: any) => {
           const files = event.target.files;
           const fileExtension = files[0].name.split(".").pop()?.toLowerCase();
-          if (fileExtension === "pdf") {
-            pdfToText(files[0])
-              .then((text) => {
-                props.onDocumentSelect(text ?? "");
-                setFiles([{ file: files[0].name, size: files[0].size }]);
-              })
-              .catch((error) =>
-                console.error("Failed to extract text from pdf"),
-              );
-          } else if (fileExtension === "docx") {
+          if (fileExtension === "docx") {
             extractTextFromDocx(files[0])
               .then((text) => {
                 props.onDocumentSelect(text ?? "");

@@ -3,13 +3,11 @@ import { showToast } from "./components/ui-lib";
 import Locale from "./locales";
 import { RequestMessage } from "./client/api";
 import { DEFAULT_MODELS } from "./constant";
-import { pdfjs } from "react-pdf";
 import * as mammoth from "mammoth";
 import readXlsxFile from "read-excel-file";
 
 // Path to the pdf.worker.js file
 // pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
-pdfjs.GlobalWorkerOptions.workerSrc = `pdf.worker.js`;
 
 export function trimTopic(topic: string) {
   // Fix an issue where double quotes still show in the Indonesian language
@@ -456,4 +454,4 @@ const extractTextFromXlsx = async (file: File): Promise<string | undefined> => {
   });
 };
 
-export { pdfToText, readTXTFile, extractTextFromDocx, extractTextFromXlsx };
+export { readTXTFile, extractTextFromDocx, extractTextFromXlsx };
