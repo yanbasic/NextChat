@@ -1,76 +1,38 @@
-import { ModalConfigValidator, ModelConfig, useAppConfig } from "../store";
-import { useEffect } from "react";
+import { ModalConfigValidator, ModelConfig } from "../store";
+
 import Locale from "../locales";
 import { InputRange } from "./input-range";
 import { ListItem, Select } from "./ui-lib";
-// import { useAllModels } from "../utils/hooks";
-import { IconButton } from "./button";
-import ResetIcon from "../icons/reload.svg";
-import { LLMModel } from "../client/api";
-import { DEFAULT_MODELS } from "@/app/constant";
+import { useAllModels } from "../utils/hooks";
 
 export function ModelConfigList(props: {
   modelConfig: ModelConfig;
   updateConfig: (updater: (config: ModelConfig) => void) => void;
 }) {
-  const appConfig = useAppConfig();
-
-  useEffect(() => {
-    const storedModels: LLMModel[] = appConfig.models;
-    if (
-      !storedModels ||
-      storedModels.length === 0 ||
-      !storedModels[0].displayName
-    ) {
-      appConfig.update(
-        (config) => (config.models = DEFAULT_MODELS as any as LLMModel[]),
-      );
-    }
-  });
+  const allModels = useAllModels();
 
   return (
     <>
       <ListItem title={Locale.Settings.Model}>
-        <div className="password-input-container">
-          <Select
-            value={props.modelConfig.model}
-            onChange={(e) => {
-              props.updateConfig(
-                (config) =>
-                  (config.model = ModalConfigValidator.model(
-                    e.currentTarget.value,
-                  )),
-              );
-            }}
-          >
-            {appConfig.models
-              .filter((v) => v.available)
-              .map((v, i) => (
-                <option value={v.name} key={i}>
-                  {v.displayName || v.name}({v.provider?.providerName})
-                </option>
-              ))}
-          </Select>
-          <IconButton
-            onClick={async () => {
-              try {
-                //TODO: change url!!!
-                const response = await fetch(
-                  "https://eiai.fun/bedrock-models.json?f=" +
-                    new Date().getTime().toString(),
-                );
-                const bedrockModels = await response.json();
-                appConfig.update(
-                  (config) =>
-                    (config.models = bedrockModels as any as LLMModel[]),
-                );
-              } catch (e) {
-                console.error(e);
-              }
-            }}
-            icon={<ResetIcon />}
-          />
-        </div>
+        <Select
+          value={props.modelConfig.model}
+          onChange={(e) => {
+            props.updateConfig(
+              (config) =>
+                (config.model = ModalConfigValidator.model(
+                  e.currentTarget.value,
+                )),
+            );
+          }}
+        >
+          {allModels
+            .filter((v) => v.available)
+            .map((v, i) => (
+              <option value={v.name} key={i}>
+                {v.displayName}({v.provider?.providerName})
+              </option>
+            ))}
+        </Select>
       </ListItem>
       <ListItem
         title={Locale.Settings.Temperature.Title}

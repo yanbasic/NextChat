@@ -290,11 +290,7 @@ export const useChatStore = createPersistStore(
         get().summarizeSession();
       },
 
-      async onUserInput(
-        content: string,
-        attachImages: string[],
-        attachFile: string,
-      ) {
+      async onUserInput(content: string, attachImages?: string[]) {
         const session = get().currentSession();
         const modelConfig = session.mask.modelConfig;
 
@@ -321,31 +317,6 @@ export const useChatStore = createPersistStore(
             }),
           );
         }
-
-        const loadFilelist = async (file: string) => {
-          try {
-            const response = await fetch(`/api/documents/list?file=${file}`);
-            const contents = await response.json();
-            return contents;
-          } catch (error) {
-            console.error("Error uploading file:", error);
-          } finally {
-            // cleanup
-          }
-        };
-
-        if (attachFile && attachFile !== "") {
-          mContent = [
-            {
-              type: "text",
-              text: userContent,
-            },
-          ];
-          mContent = mContent.concat([
-            { type: "text", text: JSON.stringify({ context: attachFile }) },
-          ]);
-        }
-
         let userMessage: ChatMessage = createMessage({
           role: "user",
           content: mContent,
@@ -375,15 +346,10 @@ export const useChatStore = createPersistStore(
         });
 
         var api: ClientApi;
-
-        if (modelConfig.model.startsWith("claude")) {
-          api = new ClientApi(ModelProvider.Claude);
+        if (modelConfig.model.startsWith("gemini")) {
+          api = new ClientApi(ModelProvider.GeminiPro);
         } else {
-          if (modelConfig.model.startsWith("gemini")) {
-            api = new ClientApi(ModelProvider.GeminiPro);
-          } else {
-            api = new ClientApi(ModelProvider.GPT);
-          }
+          api = new ClientApi(ModelProvider.GPT);
         }
 
         // make request
@@ -567,8 +533,6 @@ export const useChatStore = createPersistStore(
         var api: ClientApi;
         if (modelConfig.model.startsWith("gemini")) {
           api = new ClientApi(ModelProvider.GeminiPro);
-        } else if (modelConfig.model.startsWith("claude")) {
-          api = new ClientApi(ModelProvider.Claude);
         } else {
           api = new ClientApi(ModelProvider.GPT);
         }
@@ -595,9 +559,6 @@ export const useChatStore = createPersistStore(
               model: getSummarizeModel(session.mask.modelConfig.model),
             },
             onFinish(message) {
-              message = modelConfig.model.startsWith("claude")
-                ? (message[0] as any)["text"]
-                : message;
               get().updateCurrentSession(
                 (session) =>
                   (session.topic =

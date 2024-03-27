@@ -7,7 +7,6 @@ import {
 import { getClientConfig } from "../config/client";
 import { createPersistStore } from "../utils/store";
 import ChatGptIcon from "../icons/chatgpt.png";
-import BedrockIcon from "../icons/bedrock.png";
 import Locale from "../locales";
 import { use } from "react";
 import { useAppConfig } from ".";
@@ -107,9 +106,9 @@ export const useUpdateStore = createPersistStore(
                       if (version === remoteId) {
                         // Show a notification using Tauri
                         window.__TAURI__?.notification.sendNotification({
-                          title: "Bedrock Client",
+                          title: "NextChat",
                           body: `${Locale.Settings.Update.IsLatest}`,
-                          icon: `${BedrockIcon.src}`,
+                          icon: `${ChatGptIcon.src}`,
                           sound: "Default",
                         });
                       } else {
@@ -117,9 +116,9 @@ export const useUpdateStore = createPersistStore(
                           Locale.Settings.Update.FoundUpdate(`${remoteId}`);
                         // Show a notification for the new version using Tauri
                         window.__TAURI__?.notification.sendNotification({
-                          title: "Bedrock Client",
+                          title: "NextChat",
                           body: updateMessage,
-                          icon: `${BedrockIcon.src}`,
+                          icon: `${ChatGptIcon.src}`,
                           sound: "Default",
                         });
                       }

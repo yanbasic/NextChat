@@ -7,8 +7,6 @@ import EmojiPicker, {
 import { ModelType } from "../store";
 
 import BotIcon from "../icons/bot.svg";
-import BedrockBotIcon from "../icons/bedrock_16.svg";
-
 import BlackBotIcon from "../icons/black-bot.svg";
 
 export function getEmojiUrl(unified: string, style: EmojiStyle) {
@@ -23,6 +21,7 @@ export function AvatarPicker(props: {
 }) {
   return (
     <EmojiPicker
+      width={"100%"}
       lazyLoadEmojis
       theme={EmojiTheme.AUTO}
       getEmojiUrl={getEmojiUrl}
@@ -40,7 +39,7 @@ export function Avatar(props: { model?: ModelType; avatar?: string }) {
         {props.model?.startsWith("gpt-4") ? (
           <BlackBotIcon className="user-avatar" />
         ) : (
-          <BedrockBotIcon className="user-avatar" />
+          <BotIcon className="user-avatar" />
         )}
       </div>
     );

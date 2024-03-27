@@ -1,6 +1,5 @@
 import DeleteIcon from "../icons/delete.svg";
 import BotIcon from "../icons/bot.svg";
-import BedrockBotIcon from "../icons/bedrock_16.svg";
 
 import styles from "./home.module.scss";
 import {

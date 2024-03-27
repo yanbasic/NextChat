@@ -8,7 +8,6 @@ import {
 import { ChatMessage, ModelType, useAccessStore, useChatStore } from "../store";
 import { ChatGPTApi } from "./platforms/openai";
 import { GeminiProApi } from "./platforms/google";
-import { ClaudeApi } from "./platforms/aws";
 export const ROLES = ["system", "user", "assistant"] as const;
 export type MessageRole = (typeof ROLES)[number];
 
@@ -55,9 +54,6 @@ export interface LLMUsage {
 export interface LLMModel {
   name: string;
   available: boolean;
-  modelId?: string;
-  anthropic_version?: string;
-  displayName: string;
   provider: LLMModelProvider;
 }
 
@@ -73,7 +69,7 @@ export abstract class LLMApi {
   abstract models(): Promise<LLMModel[]>;
 }
 
-type ProviderName = "aws" | "openai" | "azure" | "claude" | "palm";
+type ProviderName = "openai" | "azure" | "claude" | "palm";
 
 interface Model {
   name: string;
@@ -97,12 +93,7 @@ interface ChatProvider {
 export class ClientApi {
   public llm: LLMApi;
 
-  constructor(provider: ModelProvider = ModelProvider.Claude) {
-    console.log("provider is:" + provider);
-    if (provider === ModelProvider.Claude) {
-      this.llm = new ClaudeApi();
-      return;
-    }
+  constructor(provider: ModelProvider = ModelProvider.GPT) {
     if (provider === ModelProvider.GeminiPro) {
       this.llm = new GeminiProApi();
       return;

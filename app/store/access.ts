@@ -18,14 +18,9 @@ const DEFAULT_OPENAI_URL =
 
 const DEFAULT_ACCESS_STATE = {
   accessCode: "",
-  useCustomConfig: true,
+  useCustomConfig: false,
 
-  provider: ServiceProvider.AWS,
-
-  // AWS
-  awsAccessKeyId: "",
-  awsSecretAccessKey: "",
-  awsRegion: "",
+  provider: ServiceProvider.OpenAI,
 
   // openai
   openaiUrl: DEFAULT_OPENAI_URL,
@@ -60,14 +55,6 @@ export const useAccessStore = createPersistStore(
       return get().needCode;
     },
 
-    hasAWSConfig() {
-      return ensure(get(), [
-        "awsAccessKeyId",
-        "awsSecretAccessKey",
-        "awsRegion",
-      ]);
-    },
-
     isValidOpenAI() {
       return ensure(get(), ["openaiApiKey"]);
     },
@@ -81,19 +68,16 @@ export const useAccessStore = createPersistStore(
     },
 
     isAuthorized() {
-      // this.fetch();
+      this.fetch();
 
-      // // has token or has code or disabled access control
-      // return (
-      //   this.isValidOpenAI() ||
-      //   this.isValidAzure() ||
-      //   this.isValidGoogle() ||
-      //   !this.enabledAccessControl() ||
-      //   (this.enabledAccessControl() && ensure(get(), ["accessCode"]))
-      // );
-
-      // do not check whether it is authorized now, check it when chat is started
-      return true;
+      // has token or has code or disabled access control
+      return (
+        this.isValidOpenAI() ||
+        this.isValidAzure() ||
+        this.isValidGoogle() ||
+        !this.enabledAccessControl() ||
+        (this.enabledAccessControl() && ensure(get(), ["accessCode"]))
+      );
     },
     fetch() {
       if (fetchState > 0 || getClientConfig()?.buildMode === "export") return;
